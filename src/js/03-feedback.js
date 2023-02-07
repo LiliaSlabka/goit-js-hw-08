@@ -1,34 +1,38 @@
 import throttle from 'lodash.throttle';
 
-const form = document.querySelector('form')
-const textarea = document.querySelector('textarea')
-const input = document.querySelector('input')
+const form = document.querySelector('form');
 
-populateTextarea()
+populateTextarea();
 
-form.addEventListener('submit', onFormSubmit)
-form.addEventListener('input', throttle(onTextareaInput, 500) )
+form.addEventListener('submit', onFormSubmit);
+form.addEventListener('input', throttle(onTextareaInput, 500));
+
 
 function onFormSubmit(event) {
-    event.preventDefault();
-    event.currentTarget.reset();
-    localStorage.removeItem('feedback-form-state')
-    console.log('Відправка форми')
+  if (!form.email.value || !form.message.value) {
+    alert('Please, enter data in all fields');
+    return;
+  }
+  event.preventDefault();
+  event.currentTarget.reset();
+  console.log(JSON.parse(localStorage.getItem('feedback-form-state')));
+  localStorage.removeItem('feedback-form-state'); 
 }
+
 
 function onTextareaInput() {
-    const data = {
-        email: input.value,
-        message: textarea.value
-    }
-    localStorage.setItem('feedback-form-state',JSON.stringify(data))
+  const data = {
+    email: form.email.value,
+    message: form.message.value,
+  };
+  localStorage.setItem('feedback-form-state',  JSON.stringify(data));
 }
 
+
 function populateTextarea() {
-    const savedData = localStorage.getItem('feedback-form-state')
-    if (savedData !== null) {
-        input.value = JSON.parse(savedData).email;
-        textarea.value = JSON.parse(savedData).message;
-    }
-    
+  const savedData = JSON.parse(localStorage.getItem('feedback-form-state'));
+  if (savedData) {
+    form.email.value = savedData.email;
+    form.message.value = savedData.message;
+  }
 }
